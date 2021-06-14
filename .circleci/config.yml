@@ -23,6 +23,15 @@ jobs:
             bash <(curl -s https://codecov.io/bash)
       - run: env VERSION_STRING=$CIRCLE_TAG make -j 3 build-all
       - run: env VERSION_STRING=$CIRCLE_TAG make latest
+      - setup_remote_docker:
+          version: "20.10.6"
+      - run:
+          name: Scan Docker container
+          command: |
+            export DOCKER_BUILDKIT=1
+            echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
+            docker build -t okteto/okteto:latest --build-arg VERSION_STRING=$CIRCLE_SHA1 .
+            docker scan okteto/okteto:latest
       - persist_to_workspace:
           root: .
           paths:
@@ -95,13 +104,6 @@ jobs:
             sha=$(cat ./artifacts/bin/okteto-Darwin-x86_64.sha256 | awk '{print $1}')
             sha_arm=$(cat ./artifacts/bin/okteto-Darwin-arm64.sha256 | awk '{print $1}')
             ./update_homebrew_formula.sh 0.0.1 $sha $sha_arm
-      - setup_remote_docker:
-          version: "19.03.8"
-      - run:
-          name: Build Docker container
-          command: |
-            export DOCKER_BUILDKIT=1
-            docker build -t okteto --build-arg VERSION_STRING=$CIRCLE_SHA1 .
 
   windows-unit:
     environment:
@@ -170,7 +172,7 @@ jobs:
             gsutil -m rsync -r ./artifacts/bin gs://downloads.okteto.com/cli/${CIRCLE_TAG}
             gsutil -m rsync -r gs://downloads.okteto.com/cli/${CIRCLE_TAG}/ gs://downloads.okteto.com/cli/
       - setup_remote_docker:
-          version: "19.03.8"
+          version: "20.10.6"
       - run:
           name: Publish Docker container
           command: |
@@ -200,13 +202,14 @@ jobs:
     steps:
       - checkout
       - setup_remote_docker:
-          version: "19.03.8"
+          version: "20.10.6"
       - run:
           name: Publish Docker container
           command: |
             export DOCKER_BUILDKIT=1
             echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
             docker build -t okteto/okteto:latest --build-arg VERSION_STRING=$CIRCLE_SHA1 .
+            docker scan okteto/okteto:latest
             docker push okteto/okteto:latest
       - attach_workspace:
           at: ./artifacts

@@ -48,7 +48,7 @@ require (
 	github.com/subosito/gotenv v1.2.0
 	github.com/vbauerster/mpb/v6 v6.0.2
 	github.com/whilp/git-urls v1.0.0
-	golang.org/x/crypto v0.0.0-20201117144127-c1f2f97bffc9
+	golang.org/x/crypto v0.0.0-20201216223049-8b5274cf687f
 	golang.org/x/oauth2 v0.0.0-20200107190931-bf48bf16ab8d
 	golang.org/x/sync v0.0.0-20200625203802-6e8e738ad208
 	google.golang.org/grpc v1.29.1
