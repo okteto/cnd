@@ -31,6 +31,7 @@ jobs:
             export DOCKER_BUILDKIT=1
             echo "$DOCKER_PASS" | docker login --username $DOCKER_USER --password-stdin
             docker build -t okteto/okteto:latest --build-arg VERSION_STRING=$CIRCLE_SHA1 .
+            docker version
             docker scan okteto/okteto:latest
       - persist_to_workspace:
           root: .
